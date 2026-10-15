@@ -98,12 +98,34 @@ node packages/team-model-routing/test/logic.test.mjs
 
 ## 安装
 
+已发布到 npm：[`dsh-plugin-team-model-routing`](https://www.npmjs.com/package/dsh-plugin-team-model-routing)；
+源码在 [Lingrui98/dsh-plugin-team-model-routing](https://github.com/Lingrui98/dsh-plugin-team-model-routing)。
+
+```sh
+npm install dsh-plugin-team-model-routing
+```
+
+或者让插件管理器指向已安装的包名 / 工作区目录：
+
 ```js
-plugin_manager({ action: 'install_bundle', target: '<本包的绝对路径或包名>' })
+plugin_manager({ action: 'install_bundle', target: 'dsh-plugin-team-model-routing' })
 ```
 
 安装只加载一次模块；由于 Node 按解析路径缓存 ES module，**替换本包代码需要重启
 Harness** 才会在运行中的进程生效。
+
+## 仓库结构
+
+```
+index.js            Cordis Host 插件：工具、路由钩子、Provider 装配
+logic.js            零依赖的路由/claim 逻辑（有单测）
+cordis.patch.yml    Loader patch：本插件行 + tool-agent-team 配置
+locale/{en,zh}.json Plugin Manager 展示文案
+test/logic.test.mjs 18 项逻辑测试（不打进 npm tarball）
+```
+
+`npm pack` 产物：`index.js`、`logic.js`、`cordis.patch.yml`、`icon.svg`、
+`locale/*.json`、`LICENSE`、两个 README。
 
 ## 已实测
 
@@ -118,21 +140,18 @@ Harness** 才会在运行中的进程生效。
 
 live 未覆盖：`fork` 上下文，以及 teammate 冷 resume 后的路由保持（见"已知限制"）。
 
-## 作为社区包发布
+## 发布新版本
 
-本包已经是 `dsh-plugin` 形态：`dsh.bundle.patch` 指向 `cordis.patch.yml`，manifest 带
-展示用 `meta`、`icon.svg` 与 `locale/{en,zh}.json`，并且是 `type: module`。
-`npm publish` 之前：
+本包是 `dsh-plugin` 形态：`dsh.bundle.patch` 指向 `cordis.patch.yml`，manifest 带
+展示用 `meta`、`icon.svg`、`locale/{en,zh}.json`，并且是 `type: module`。发布流程：
 
-1. 补齐 `package.json` 里剩余 npm 元数据：`repository`、`homepage`、`bugs`、`author`。
-   这里故意留空，因为只有你知道仓库最终落在哪里。
-2. 确认包名可用：`npm view dsh-plugin-team-model-routing version`。若已被占用，改成
-   scope 形式（如 `@your-scope/dsh-plugin-team-model-routing`），并同步修改
-   `cordis.patch.yml` 里的 `name:` —— Loader 是按这个字符串解析行的。
-3. 打 tarball 并核对实际内容：`npm pack --dry-run`（预期包含 `index.js`、`logic.js`、
-   `cordis.patch.yml`、`icon.svg`、`locale/*.json`、`LICENSE`、`README.md`、
-   `README.zh.md`、`package.json`）。
-4. 发布后给仓库加上 [`dsh-plugin`](https://github.com/topics/dsh-plugin) 话题，便于被发现。
+1. 改 `package.json` 的 `version`（npm 不允许重复发布同一版本）。
+2. `node test/logic.test.mjs` —— 18 项必须全过。
+3. `npm pack --dry-run` —— 确认 tarball 就是「仓库结构」里列的 10 个文件。
+4. `npm publish` —— npm 账号开了 2FA，所以要带 `--otp=<code>`，或改用勾了
+   **bypass 2FA** 的 granular token。需要验证码时当场问，不要把它存下来。
+5. `git commit` 并 `git push`。
+6. 若包名有变，同步修改 `cordis.patch.yml` 里的 `name:` —— Loader 按这个字符串解析行。
 
 ## 推动上游修复
 
@@ -140,8 +159,13 @@ live 未覆盖：`fork` 上下文，以及 teammate 冷 resume 后的路由保�
 provider 无法贡献 `agentOptions`，因为 continuable 子代理根本不会调用 provider 的
 `start()`。如果该缺口被补上，本包保留工具与发现部分，删掉那段绕行即可。
 
-上游仓库不接受外部 PR，所以提出方式是 GitHub Discussion。可直接发帖的文稿在仓库里：
+上游仓库不接受外部 PR，所以提出方式是 GitHub Discussion。可直接发帖的文稿在工作区的
+`proposal/` 目录（不打进 npm tarball）：
 
 - `proposal/discussion-post.zh.md` —— 帖子正文（中文，可直接复制）。
 - `proposal/upstream-continuable-agent-options.zh.md` —— 完整提案，含精确代码路径与测试点。
 - `proposal/upstream-continuable-agent-options.md` —— 英文版。
+
+发到 `deepseek-ai/deepseek-harness` → Discussions → **Show Your Plugins!**（介绍本包）
+或 **Ideas**（提 API 缺口）。注意在该仓库建 Discussion 需要对它有写权限，外部贡献者
+没有，所以这份文稿是给人手动粘贴用的。

@@ -111,13 +111,36 @@ claim store, and teammate-name extraction. It covers `logic.js` only — the
 
 ## Install
 
+Published as [`dsh-plugin-team-model-routing`](https://www.npmjs.com/package/dsh-plugin-team-model-routing)
+on npm, source at [Lingrui98/dsh-plugin-team-model-routing](https://github.com/Lingrui98/dsh-plugin-team-model-routing).
+
+```sh
+npm install dsh-plugin-team-model-routing
+```
+
+or point the plugin manager at the installed package or a workspace directory:
+
 ```js
-plugin_manager({ action: 'install_bundle', target: '<abs path to this package>' })
+plugin_manager({ action: 'install_bundle', target: 'dsh-plugin-team-model-routing' })
 ```
 
 Installing loads the module once; because Node caches ES modules by resolved
 path, **replacing this package's code requires a Harness restart** to take
 effect in a running process.
+
+## Repository layout
+
+```
+index.js            Cordis Host plugin: tools, routing hook, Provider wiring
+logic.js            dependency-free routing/claim logic (unit-tested)
+cordis.patch.yml    Loader patch: this row + the tool-agent-team config
+locale/{en,zh}.json Plugin Manager display metadata
+test/logic.test.mjs the 18-check logic suite (not shipped in the npm tarball)
+```
+
+`npm pack` ships `index.js`, `logic.js`, `cordis.patch.yml`, `icon.svg`,
+`locale/*.json`, `LICENSE`, and both READMEs.
+
 
 ## Verified live
 
@@ -134,33 +157,24 @@ Observed on the `desktop` profile, 2026-10-15, with the profile's
 Not covered by the live run: the `fork` context, and route survival across a
 teammate cold-resume (see Known limits).
 
-## Publishing this as a community package
+## Releasing a new version
 
-The package is already `dsh-plugin` shaped: `dsh.bundle.patch` points at
-`cordis.patch.yml`, the manifest carries display `meta`, `icon.svg` and
-`locale/{en,zh}.json`, and it is `type: module`. Before `npm publish`:
+The package is `dsh-plugin` shaped: `dsh.bundle.patch` points at
+`cordis.patch.yml`, the manifest carries display `meta`, `icon.svg`, `locale/{en,zh}.json`,
+and it is `type: module`. To release:
 
-1. Add the remaining npm metadata to `package.json` — `repository`, `homepage`,
-   `bugs`, `author`. None of them is set here, because only you know the URL your
-   fork or repository will live at.
-2. Check the name is still free: `npm view dsh-plugin-team-model-routing version`.
-   If it is taken, scope it (for example `@your-scope/dsh-plugin-team-model-routing`)
-   and update the `name:` line in `cordis.patch.yml` to match — the Loader resolves
-   the row by that string.
-3. Build the tarball and inspect exactly what ships:
-   `npm pack --dry-run` (expected: `index.js`, `logic.js`, `cordis.patch.yml`,
-   `icon.svg`, `locale/*.json`, `LICENSE`, `README.md`, `README.zh.md`,
-   `package.json`).
-4. Publish, then add the [`dsh-plugin`](https://github.com/topics/dsh-plugin)
-   topic to the repository so it can be found.
+1. Bump `version` in `package.json` (npm rejects a re-publish of an existing version).
+2. `node test/logic.test.mjs` — 18 checks must pass.
+3. `npm pack --dry-run` — confirm the tarball is the 10 files listed under
+   [Repository layout](#repository-layout).
+4. `npm publish` — the npm account has 2FA enabled, so pass `--otp=<code>` or use a
+   granular token with **bypass 2FA** enabled. When a code is needed, ask for one
+   interactively rather than storing it.
+5. `git commit` and `git push` the release.
+6. If the package name ever changes, update the `name:` line in `cordis.patch.yml`
+   to match — the Loader resolves the row by that string.
 
-Installing the published package is then the documented path:
-
-```sh
-dsh plugin add dsh-plugin-team-model-routing   # or: plugin_manager install_bundle
-```
-
-### Inviting the upstream fix
+## Inviting the upstream fix
 
 The `agent/pre-step` rewrite in this package is a workaround for a missing
 upstream extension point: a continuable-subagent provider cannot contribute
@@ -169,11 +183,18 @@ children. If that gap is closed, this package keeps its tools and drops the
 workaround.
 
 The upstream repository does not accept external PRs, so the way to raise it is a
-GitHub Discussion. Ready-to-post write-ups live next to this repository:
+GitHub Discussion. Ready-to-post write-ups live in the workspace's `proposal/`
+directory (they are not part of the npm tarball):
 
 - `proposal/discussion-post.zh.md` — the post itself (Chinese, copy-paste).
 - `proposal/upstream-continuable-agent-options.zh.md` — full proposal with the
   exact code paths and test points.
 - `proposal/upstream-continuable-agent-options.md` — the same in English.
+
+Post it in `deepseek-ai/deepseek-harness` → Discussions → **Show Your Plugins!**
+(to introduce this package) or **Ideas** (to raise the API gap). Note that a
+Discussion there needs write permission on that repository, which an outside
+contributor does not have — the prepared text is meant to be pasted by a human.
+
 
 
