@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Team Model Routing",
+    "description": "Spawn teammates on a chosen provider, model, and reasoning effort, validated against the Subagent model-selection allowlist."
+  }
+}

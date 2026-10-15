@@ -1,0 +1,51 @@
+{
+  "name": "dsh-plugin-team-model-routing",
+  "version": "1.0.0",
+  "description": "Let an Agent Teams Lead choose the provider, model, and reasoning effort of each teammate it spawns.",
+  "license": "MIT",
+  "author": "lingruigou",
+  "type": "module",
+  "icon": "./icon.svg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lingrui98/dsh-plugin-team-model-routing.git"
+  },
+  "homepage": "https://github.com/Lingrui98/dsh-plugin-team-model-routing#readme",
+  "bugs": {
+    "url": "https://github.com/Lingrui98/dsh-plugin-team-model-routing/issues"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "logic.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "LICENSE",
+    "README.md",
+    "README.zh.md"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "cordis",
+    "agent-teams",
+    "subagent",
+    "llm-routing",
+    "model-selection"
+  ],
+  "meta": {
+    "title": "Team Model Routing",
+    "description": "Spawn teammates on a chosen provider, model, and reasoning effort, validated against the Subagent model-selection allowlist."
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "队友模型路由",
+    "description": "在创建 teammate 时指定 provider、model 与 reasoning effort，并用 Subagent 模型选择白名单校验。"
+  }
+}

@@ -1,0 +1,22 @@
+# Team Model Routing: add the routed-spawn tool and the teammate routing hook.
+#
+# The routing hook rewrites a teammate's resolved AgentOptions before its first
+# model request is prepared, so the Team tool row needs no provider indirection.
+# The override below only restates the row's own defaults, keeping this bundle
+# correct even if an earlier layer left a wrapper provider name behind.
+
+- insert:
+    - id: team-model-routing
+      name: 'dsh-plugin-team-model-routing-next'
+      config:
+        toolName: spawn_teammate_routed
+        listToolName: list_teammate_models
+        routeTtlMs: 120000
+
+# `config` is replaced wholesale by the Loader: restate every field the row needs.
+- id: tool-agent-team
+  name: '@deepseek-ai/dsh-experimental-tool-agent-team'
+  config:
+    freshProvider: spawn
+    forkProvider: fork
+
